@@ -1,0 +1,18 @@
+name: Periodic Health Check
+
+on:
+  workflow_dispatch: # Allows manual testing from the Actions tab
+  schedule:
+    - cron: '0 0 * * *' # Runs once a day at midnight UTC
+
+jobs:
+  health_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the deployed service URL
+        uses: jasonit/url-health-check@v1
+        with:
+          # Your specific Render URL
+          url: https://ci-cd-pokedex-sxwz.onrender.com/health
+          max-attempts: 3
+          retry-delay: 5s
