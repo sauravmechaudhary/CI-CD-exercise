@@ -41,16 +41,13 @@ jobs:
         if: failure()
         with:
           severity: error
-          details: |
-            Build Failed!
-            Commit: ${{ github.event.head_commit.url }}
-            Author: ${{ github.actor }}
+          details: Build Failed! Check the Actions tab for details.
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
 
   deploy_and_tag:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
-    # Ex 14 & 16: Only run on push to main AND if skip isn't in the commit message
+    # Run only on push to main AND if #skip is NOT in any commit message
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' '), '#skip') }}
     steps:
       - uses: actions/checkout@v4
