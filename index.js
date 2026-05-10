@@ -1,15 +1,23 @@
-const http = require('http')
+const express = require('express')
+const app = express()
 
-const hostname = '127.0.0.1'
-const port = 3000
+// Get the port from environment variables (important for Render)
+const PORT = process.env.PORT || 5001
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200
-  res.setHeader('Content-Type', 'text/plain')
-  res.end('Hello CI/CD Exercise!\n')
+// Serve the static files from the Webpack build folder
+app.use(express.static('dist'))
+
+// Health check endpoint for Exercise 12
+app.get('/health', (req, res) => {
+  res.send('ok')
 })
 
-server.listen(port, hostname, () => {
+// Version endpoint for Exercise 10
+app.get('/version', (req, res) => {
+  res.send('1') // Increment this to '2', '3', etc., to verify new deployments
+})
+
+app.listen(PORT, () => {
   // eslint-disable-next-line no-console
-  console.log(`Server running at http://${hostname}:${port}/`)
+  console.log(`server started on port ${PORT}`)
 })
