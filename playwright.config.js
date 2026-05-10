@@ -1,8 +1,10 @@
 const { defineConfig } = require('@playwright/test')
 
 module.exports = defineConfig({
-  testDir: './e2e-tests', // Ensure this matches where your .spec.js files are!
-  testMatch: '**/*.spec.js',
+  // Change this to match your folder structure
+  testDir: './src',
+  // Look for any files ending in .spec.js or .test.js
+  testMatch: ['**/*.spec.js'],
   use: {
     baseURL: 'http://localhost:5001',
   },
