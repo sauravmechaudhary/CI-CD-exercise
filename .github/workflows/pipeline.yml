@@ -1,9 +1,11 @@
 name: Deployment pipeline
 
 on:
+  # Ex 13: Runs on pushes to main
   push:
     branches:
       - main
+  # Ex 13: Runs on pull requests to main
   pull_request:
     branches: [main]
     types: [opened, synchronize]
@@ -13,7 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -36,10 +37,25 @@ jobs:
       - name: Run E2E tests
         run: npm run test:e2e
       
-  deploy:
+      # Ex 14 & 16: Deploy ONLY if pushed to main AND commit message lacks '#skip'
+      - name: Trigger deployment
+        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' '), '#skip') }}
+        run: curl ${{ secrets.RENDER_DEPLOY_HOOK }}
+
+  # Ex 15: Create a new job for tagging that waits for the pipeline to pass
+  tag_release:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    # Ex 16: Tag ONLY if pushed to main AND commit message lacks '#skip'
+    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' '), '#skip') }}
     steps:
-      - name: Trigger deployment
-        run: curl ${{ secrets.RENDER_DEPLOY_HOOK }}
+      # We need to checkout the code before tagging. fetch-depth: '0' is needed to get all history and tags!
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+          
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.75.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch # Ex 15: Default to patch bump
