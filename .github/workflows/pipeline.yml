@@ -36,3 +36,11 @@ jobs:
 
       - name: Run E2E tests
         run: npm run test:e2e
+      
+    deploy:
+    needs: [test] # Only deploy if tests pass!
+    runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    steps:
+      - name: Trigger deployment
+        run: curl ${{ secrets.RENDER_DEPLOY_HOOK }}
