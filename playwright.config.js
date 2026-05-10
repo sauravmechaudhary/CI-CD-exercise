@@ -2,7 +2,7 @@ const { defineConfig } = require('@playwright/test')
 
 module.exports = defineConfig({
   testDir: './src',
-  testMatch: 'pokedex.spec.js',
+  testMatch: '**/*.spec.js',
   use: {
     baseURL: 'http://localhost:3000'
   },
