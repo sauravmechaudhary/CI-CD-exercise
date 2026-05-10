@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -32,12 +33,16 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      - name: Run E2E tests
-        run: npm run test:e2e
+      - name: Start server and run E2E tests
+        run: |
+          node index.js &
+          npx wait-on http://localhost:5001
+          npm run test:e2e
       
   deploy:
-    needs: [simple_deployment_pipeline] # Fixed: name must match the job above
-    runs-on: ubuntu-20.04
+    needs: [simple_deployment_pipeline]
+    runs-on: ubuntu-latest
+    # This ensures deployment only happens on pushes to main, not on PRs
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
       - name: Trigger deployment
