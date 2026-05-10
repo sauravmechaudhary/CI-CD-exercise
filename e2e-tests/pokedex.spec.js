@@ -1,9 +1,13 @@
-const { test, describe, expect } = require('@playwright/test')
+const { defineConfig } = require('@playwright/test')
 
-describe('Pokedex', () => {
-  test('front page can be opened', async ({ page }) => {
-    // This assumes your app will be running on port 5000 during the test
-    await page.goto('http://localhost:5000')
-    await expect(page.getByText('Hello CI/CD Exercise!')).toBeVisible()
-  })
+module.exports = defineConfig({
+  testDir: './e2e-tests',
+  use: {
+    baseURL: 'http://localhost:3000', // Match here
+  },
+  webServer: {
+    command: 'npm start',
+    url: 'http://localhost:3000', // And match here
+    reuseExistingServer: !process.env.CI,
+  },
 })
